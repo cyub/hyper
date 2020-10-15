@@ -7,8 +7,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/cyub/hyper/config"
+	_config "github.com/cyub/hyper/config"
 	"github.com/cyub/hyper/logger"
+	config "github.com/cyub/hyper/pkg/config"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
@@ -86,11 +87,11 @@ func (app *App) bootConfig() (err error) {
 	if len(app.CfgCenterPath) == 0 {
 		app.CfgCenterPath = fmt.Sprintf("%s/%s/config", app.Name, app.RunMode)
 	}
-	err = config.Init("consul", app.CfgCenterAddr, app.CfgCenterPath)
+	err = _config.Init(app.CfgCenterAddr, app.CfgCenterPath)
 	if err != nil {
 		panic(err)
 	}
-	app.Config = config.Instance()
+	app.Config = _config.Instance()
 	if len(app.Addr) == 0 {
 		app.Addr = app.Config.GetString("app.addr", ":8000")
 	}

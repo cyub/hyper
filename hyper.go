@@ -5,9 +5,10 @@ import (
 	"fmt"
 
 	"github.com/cyub/hyper/app"
-	"github.com/cyub/hyper/config"
+	_config "github.com/cyub/hyper/config"
 	"github.com/cyub/hyper/logger"
 	"github.com/cyub/hyper/mysql"
+	"github.com/cyub/hyper/pkg/config"
 	"github.com/cyub/hyper/queue"
 	"github.com/cyub/hyper/redis"
 	_redis "github.com/go-redis/redis/v7"
@@ -32,7 +33,7 @@ func Redis() *_redis.Client {
 
 // Config return config.Config
 func Config() *config.Config {
-	return config.Instance()
+	return _config.Instance()
 }
 
 // Logger return logrus.Logger

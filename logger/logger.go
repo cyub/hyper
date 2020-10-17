@@ -27,7 +27,7 @@ func Instance() *logrus.Logger {
 }
 
 // Init init logger
-func Init(writer, levelLab, file string) error {
+func Init(writer, levelLab, file, format string) error {
 	if stdWriter, ok := stdWriters[writer]; ok {
 		logger.SetOutput(stdWriter)
 	} else {
@@ -37,7 +37,7 @@ func Init(writer, levelLab, file string) error {
 
 		f, err := os.OpenFile(file, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
 		if err != nil {
-			return fmt.Errorf("logger file open file %s", err.Error())
+			return fmt.Errorf("logger file[%s] %s", file, err.Error())
 		}
 		logger.SetOutput(f)
 	}
@@ -48,9 +48,14 @@ func Init(writer, levelLab, file string) error {
 	}
 
 	logger.SetLevel(level)
-	logger.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp: true,
-	})
+	if format == "json" {
+		logger.SetFormatter(&logrus.JSONFormatter{})
+	} else {
+		logger.SetFormatter(&logrus.TextFormatter{
+			FullTimestamp: true,
+		})
+	}
+
 	return nil
 }
 

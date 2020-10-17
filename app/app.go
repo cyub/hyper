@@ -110,8 +110,9 @@ func (app *App) bootConfig() (err error) {
 
 func (app *App) bootLogger() (err error) {
 	err = logger.Init(app.Config.GetString("log.writer", "stdout"),
-		app.Config.GetString("log.logger_level", "DEBUG"),
-		app.Config.GetString("log.log_file", ""))
+		app.Config.GetString("log.level", "DEBUG"),
+		app.Config.GetString("log.file", ""),
+		app.Config.GetString("log.format", "text"))
 	if err != nil {
 		panic(err)
 	}

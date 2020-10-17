@@ -10,8 +10,8 @@ import (
 	"github.com/cyub/hyper/mysql"
 	"github.com/cyub/hyper/pkg/config"
 	"github.com/cyub/hyper/queue"
-	"github.com/cyub/hyper/redis"
-	_redis "github.com/go-redis/redis/v7"
+	_redis "github.com/cyub/hyper/redis"
+	"github.com/go-redis/redis/v7"
 	"github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
 )
@@ -27,8 +27,13 @@ func DB() *gorm.DB {
 }
 
 // Redis return redis.Client
-func Redis() *_redis.Client {
-	return redis.Instance()
+func Redis() *redis.Client {
+	return _redis.Instance()
+}
+
+// RedisCluster return redis.ClusterClient
+func RedisCluster() *redis.ClusterClient {
+	return _redis.ClusterInstance()
 }
 
 // Config return config.Config

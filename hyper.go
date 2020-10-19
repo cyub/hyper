@@ -5,9 +5,11 @@ import (
 	"fmt"
 
 	"github.com/cyub/hyper/app"
+	_cache "github.com/cyub/hyper/cache"
 	_config "github.com/cyub/hyper/config"
 	"github.com/cyub/hyper/logger"
 	"github.com/cyub/hyper/mysql"
+	"github.com/cyub/hyper/pkg/cache"
 	"github.com/cyub/hyper/pkg/config"
 	"github.com/cyub/hyper/queue"
 	_redis "github.com/cyub/hyper/redis"
@@ -49,6 +51,11 @@ func Logger() *logrus.Logger {
 // Queue return queue.Queue
 func Queue() *queue.Queue {
 	return queue.Instance()
+}
+
+// Cache return cache.Cache
+func Cache() cache.Cache {
+	return _cache.Instance()
 }
 
 // NewJob return job

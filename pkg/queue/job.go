@@ -8,9 +8,12 @@ import (
 // Jober define job interface
 type Jober interface {
 	GetName() string
+	GetMaxTries() int
 	Serialize() ([]byte, error)
 	Unserialize() (Job, error)
-	GetMaxTries() int
+	PackPayload() ([]byte, error)
+	UnpackPayload(interface{}) error
+	GetPayload() []byte
 }
 
 // Job struct
@@ -26,6 +29,16 @@ func (j *Job) GetName() string {
 	return j.Name
 }
 
+// GetMaxTries return the max tries time of job
+func (j *Job) GetMaxTries() int {
+	return j.MaxTries
+}
+
+// GetPayload return the payload of job
+func (j *Job) GetPayload() []byte {
+	return j.Payload
+}
+
 // Serialize use for serialize job
 func (j *Job) Serialize() (data []byte, err error) {
 	data, err = json.Marshal(j)
@@ -35,11 +48,6 @@ func (j *Job) Serialize() (data []byte, err error) {
 // Unserialize use for unserialize job
 func (j *Job) Unserialize() (Job, error) {
 	return *j, nil
-}
-
-// GetMaxTries return the job max try times
-func (j *Job) GetMaxTries() int {
-	return j.MaxTries
 }
 
 // PackPayload use for pack the data of job

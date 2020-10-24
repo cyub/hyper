@@ -11,7 +11,8 @@ import (
 	"github.com/cyub/hyper/mysql"
 	"github.com/cyub/hyper/pkg/cache"
 	"github.com/cyub/hyper/pkg/config"
-	"github.com/cyub/hyper/queue"
+	"github.com/cyub/hyper/pkg/queue"
+	_queue "github.com/cyub/hyper/queue"
 	_redis "github.com/cyub/hyper/redis"
 	"github.com/go-redis/redis/v7"
 	"github.com/jinzhu/gorm"
@@ -49,8 +50,8 @@ func Logger() *logrus.Logger {
 }
 
 // Queue return queue.Queue
-func Queue() *queue.Queue {
-	return queue.Instance()
+func Queue() queue.Queuer {
+	return _queue.Instance()
 }
 
 // Cache return cache.Cache
@@ -59,30 +60,31 @@ func Cache() cache.Cache {
 }
 
 // NewJob return job
-func NewJob(name string, data interface{}) (*queue.Job, error) {
+func NewJob(name string, data interface{}, tries int) (*queue.Job, error) {
 	payload, err := json.Marshal(data)
 	if err != nil {
 		return nil, fmt.Errorf("job payload can't marshal %s", err.Error())
 	}
 	job := &queue.Job{
-		Name:    name,
-		Payload: payload,
+		Name:     name,
+		Payload:  payload,
+		MaxTries: tries,
 	}
 	return job, nil
 }
 
 // InQueue use for job enqueue
 func InQueue(name string, data interface{}) error {
-	job, err := NewJob(name, data)
-	if err != nil {
-		return err
-	}
-	err = queue.Instance().In(job)
-	if err != nil {
-		return err
-	}
+	return InQueueWithRetry(name, data, 1)
+}
 
-	return nil
+// InQueueWithRetry use for job enqueue
+func InQueueWithRetry(name string, data interface{}, tries int) error {
+	job, err := NewJob(name, data, tries)
+	if err != nil {
+		return err
+	}
+	return _queue.Instance().In(job)
 }
 
 // WithName use for set app's name

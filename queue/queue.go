@@ -1,120 +1,77 @@
 package queue
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/cyub/hyper/app"
 	"github.com/cyub/hyper/logger"
-	_redis "github.com/cyub/hyper/redis"
-	"github.com/go-redis/redis/v7"
+	"github.com/cyub/hyper/pkg/config"
+	"github.com/cyub/hyper/pkg/queue"
+	redisQueue "github.com/cyub/hyper/pkg/queue/redis"
+	"github.com/cyub/hyper/redis"
 )
 
-const (
-	defaultQueue   = "hyper:queue:default"
-	defaultTimeout = 5
+var (
+	queuer queue.Queuer
 )
 
-// Queue struct
-type Queue struct {
-	Name        string
-	Backend     *redis.Client
-	WaitTimeOut time.Duration
-	Consumers   map[string]Consumer
-}
-
-var queue *Queue
-
-// Consumer define job consumer
-type Consumer func(job *Job) error
-
-// Provider use for mount to app bootstrap
-func Provider(consumers ...map[string]Consumer) app.ComponentMount {
+// Provider provide queue
+func Provider(consumers ...map[string]queue.Consumer) app.ComponentMount {
 	return func(app *app.App) error {
-		redis := _redis.Instance()
-		if redis == nil {
-			return errors.New("please boot with redis as queue store backend")
+		baseOpts := queue.Options{
+			Name:        app.Config.GetString("queue.name", ""),
+			Driver:      app.Config.GetString("queue.driver", "redis"),
+			WaitTimeOut: app.Config.GetDuration("queue.timeout", 0) * time.Second,
+			Debug:       app.Config.GetBool("queue.debug", false),
+			Metric:      app.Config.GetBool("queue.metric", true),
+			Consume:     app.Config.GetBool("queue.consume", true),
+			Parallel:    app.Config.GetInt("queue.parallel_number", 1),
+			Logger:      logger.Instance(),
 		}
-		queue = &Queue{
-			Name:        app.Config.GetString("queue.name", defaultQueue),
-			Backend:     redis,
-			WaitTimeOut: time.Duration(app.Config.GetInt("queue.timeout", defaultTimeout)) * time.Second,
-			Consumers:   make(map[string]Consumer),
+		if baseOpts.Driver != "redis" {
+			return queue.ErrInvalidProvider
+		}
+
+		var err error
+		queuer, err = createRedisQueue(app.Config, baseOpts)
+		if err != nil {
+			return err
 		}
 
 		for _, consumer := range consumers {
 			for name, c := range consumer {
-				RegisterConsumer(name, c)
+				queue.RegisterConsumer(name, c)
 			}
 		}
 
-		for name, w := range _consumers {
-			queue.AddConsumer(name, w)
+		if baseOpts.Metric {
+			queue.MetricTurnon()
 		}
-		go queue.Run()
+
+		if baseOpts.Consume {
+			queuer.Run()
+		}
+		app.Logger.Infof("queue-%s ping is ok", baseOpts.Driver)
 		return nil
 	}
 }
 
+func createRedisQueue(config *config.Config, baseOpts queue.Options) (queue.Queuer, error) {
+	redis := redis.Instance()
+	if redis == nil {
+		return nil, errors.New("please boot with redis as queue store backend")
+	}
+
+	opts := redisQueue.Options{
+		Options: baseOpts,
+		Backend: redis,
+	}
+
+	return redisQueue.New(opts), nil
+}
+
 // Instance return instance of Queue
-func Instance() *Queue {
-	return queue
-}
-
-// AddConsumer use for queue consumer
-func (q *Queue) AddConsumer(name string, f Consumer) {
-	q.Consumers[name] = f
-}
-
-// In use job enqueue
-func (q *Queue) In(job Jober) error {
-	data, err := job.Serialize()
-	if err != nil {
-		fmt.Printf("in job error %s", err.Error())
-		return err
-	}
-	err = q.Backend.LPush(q.Name, data).Err()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// Run use for queue run
-func (q *Queue) Run() {
-	for {
-		data, err := q.Backend.BRPop(q.WaitTimeOut, q.Name).Result()
-		if err != nil {
-			continue
-		}
-
-		job, err := q.Parse(data[1])
-		if err != nil {
-			panic(err)
-		}
-
-		name := job.GetName()
-		if w, exist := q.Consumers[name]; exist {
-			tries := job.GetMaxTries()
-			for {
-				if w(&job) == nil {
-					break
-				}
-				tries--
-				if tries <= 0 {
-					break
-				}
-			}
-		} else {
-			logger.Errorf("job[%s] consumer don't exist", name)
-		}
-	}
-}
-
-// Parse use for parse job info
-func (q *Queue) Parse(payload string) (j Job, err error) {
-	err = json.Unmarshal([]byte(payload), &j)
-	return
+func Instance() queue.Queuer {
+	return queuer
 }

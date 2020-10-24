@@ -39,13 +39,15 @@ func ClusterInstance() *redis.ClusterClient {
 // Init use for init redis client
 func Init(app *app.App) error {
 	opts := &redis.Options{
-		Addr:         app.Config.GetString("redis.addr", "localhost:6379"),
-		Password:     app.Config.GetString("redis.password", ""),
-		DB:           app.Config.GetInt("redis.db", 0),
-		ReadTimeout:  app.Config.GetDuration("redis.read_timeout", 3) * time.Second,
-		WriteTimeout: app.Config.GetDuration("redis.write_timeout", 3) * time.Second,
-		PoolSize:     app.Config.GetInt("redis.pool_size", 50),
-		PoolTimeout:  app.Config.GetDuration("redis.pool_timeout", 5) * time.Second,
+		Addr:            app.Config.GetString("redis.addr", "localhost:6379"),
+		Password:        app.Config.GetString("redis.password", ""),
+		DB:              app.Config.GetInt("redis.db", 0),
+		ReadTimeout:     app.Config.GetDuration("redis.read_timeout", 3) * time.Second,
+		WriteTimeout:    app.Config.GetDuration("redis.write_timeout", 3) * time.Second,
+		PoolSize:        app.Config.GetInt("redis.pool_size", 50),
+		PoolTimeout:     app.Config.GetDuration("redis.pool_timeout", 5) * time.Second,
+		MaxRetryBackoff: app.Config.GetDuration("redis.max_retry_backoff", 512) * time.Millisecond,
+		MinRetryBackoff: app.Config.GetDuration("redis.min_retry_backoff", 8) * time.Millisecond,
 	}
 
 	client = redis.NewClient(opts)

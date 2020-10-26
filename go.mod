@@ -3,6 +3,7 @@ module github.com/cyub/hyper
 go 1.13
 
 require (
+	github.com/Shopify/sarama v1.27.2
 	github.com/gin-gonic/gin v1.6.0
 	github.com/go-redis/redis/v7 v7.2.0
 	github.com/jinzhu/gorm v1.9.12

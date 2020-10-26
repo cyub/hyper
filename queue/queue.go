@@ -8,6 +8,7 @@ import (
 	"github.com/cyub/hyper/logger"
 	"github.com/cyub/hyper/pkg/config"
 	"github.com/cyub/hyper/pkg/queue"
+	kafkaQueue "github.com/cyub/hyper/pkg/queue/kafka"
 	redisQueue "github.com/cyub/hyper/pkg/queue/redis"
 	"github.com/cyub/hyper/redis"
 )
@@ -29,12 +30,16 @@ func Provider(consumers ...map[string]queue.Consumer) app.ComponentMount {
 			Parallel:    app.Config.GetInt("queue.parallel_number", 1),
 			Logger:      logger.Instance(),
 		}
-		if baseOpts.Driver != "redis" {
-			return queue.ErrInvalidProvider
-		}
 
 		var err error
-		queuer, err = createRedisQueue(app.Config, baseOpts)
+		switch baseOpts.Driver {
+		case "redis":
+			queuer, err = createRedisQueue(app.Config, baseOpts)
+		case "kafka":
+			queuer, err = createKafkaQueue(app.Config, baseOpts)
+		default:
+			return queue.ErrInvalidProvider
+		}
 		if err != nil {
 			return err
 		}
@@ -69,6 +74,17 @@ func createRedisQueue(config *config.Config, baseOpts queue.Options) (queue.Queu
 	}
 
 	return redisQueue.New(opts), nil
+}
+
+func createKafkaQueue(config *config.Config, baseOpts queue.Options) (queue.Queuer, error) {
+	opts := kafkaQueue.Options{
+		Options:      baseOpts,
+		Brokers:      config.GetStringSlice("queue.kafka_brokers", []string{"localhost:9092"}),
+		GroupID:      config.GetString("queue.kafka_group_id", "hyper-consume-group"),
+		KafkaVersion: config.GetString("queue.kafka_version", "2.1.1"),
+	}
+
+	return kafkaQueue.New(opts), nil
 }
 
 // Instance return instance of Queue

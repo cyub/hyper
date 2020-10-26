@@ -18,7 +18,7 @@ var (
 	defaultQueue                 = "hyper:queue:default"
 	defaultTimeout time.Duration = 5
 	// ErrInvalidProvider when provider invalid return
-	ErrInvalidProvider = errors.New("config: invalid config center provider")
+	ErrInvalidProvider = errors.New("config: invalid queue provider")
 )
 
 // Queuer interface

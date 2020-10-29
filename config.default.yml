@@ -1,0 +1,51 @@
+app:
+    addr: :8000 # the addr of app
+  
+  mysql:
+    host: localhost
+    port: 3306
+    user: homestead
+    passwd: secret
+    db: hyper
+    loc: UTC
+    collation: utf8mb4_general_ci
+    charset:
+    parse_time: true
+    log: true # true mean open gorm log
+  
+  log:
+    writer: stdout # the file of log write to. stdout/stderr/file
+    level: DEBUG
+    file: # the file absolute path
+    format: text # the format of log output, support text and json
+  
+  redis:
+    addr: localhost:6379
+    db: 0
+    password: 
+    read_timeout: 3
+    write_timeout: 3
+    pool_size: 50
+    pool_timeout: 15
+  
+  queue:
+    name: hyper:queue:default # the queue's name, where driver is kafka, as kafka topic
+    driver: redis # suport redis and kafka
+    timeout: 5 # the timeout pull message from queue, only work in redis driver
+    debug: false # default close debug
+    metric: true # default open metric exporter
+    consume: true # default the queue can consume
+    parallel_number: 1 # the job paraller process goroutine number
+    kafka_brokers: # kafka brokers, only work in kafka driver
+      - localhost:9092
+    kafka_group_id: hyper-consume-group # the consume group id of kafka
+    kafka_version: 2.1.1 # the version of kafka
+  
+  registry:
+    addr: localhost:8500 # the addr of registry center, only consul
+    timeout: 1
+    debug: false
+  
+  cache:
+    driver: redis
+    prefix: hyper # the prefix of cache key

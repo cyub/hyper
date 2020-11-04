@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	_config "github.com/cyub/hyper/config"
@@ -24,6 +25,7 @@ type App struct {
 	Components        []string
 	ComponentMounters []ComponentMount
 	RouterRegisters   []func(r *gin.Engine)
+	Once              sync.Once
 }
 
 // ComponentMount use for mount component interface
@@ -60,14 +62,15 @@ func (app *App) BootstrapWith(mounters ...ComponentMount) *App {
 
 // Bootstrap use for boot core components
 func (app *App) Bootstrap() *App {
-	app.bootConfig()
-	if app.Gin == nil {
-		app.SetGin(gin.New())
-	}
-	app.bootLogger()
-	app.bootMiddlewares()
-	app.bootRoutes()
-	app.bootComponents()
+	app.Once.Do(func() {
+		app.bootConfig()
+		app.bootBuildIns()
+		app.bootLogger()
+		app.bootMiddlewares()
+		app.bootRoutes()
+		app.bootComponents()
+	})
+
 	return app
 }
 
@@ -108,6 +111,16 @@ func (app *App) bootConfig() (err error) {
 	return
 }
 
+func (app *App) bootBuildIns() {
+	if app.Gin == nil {
+		app.SetGin(gin.New())
+	}
+
+	if app.Config.GetBool("app.gin_logger", false) {
+		app.Use(gin.Logger())
+	}
+}
+
 func (app *App) bootLogger() (err error) {
 	err = logger.Init(app.Config.GetString("log.writer", "stdout"),
 		app.Config.GetString("log.level", "DEBUG"),
@@ -141,7 +154,6 @@ func (app *App) bootMiddlewares() {
 // Run use for run application
 func (app *App) Run() (err error) {
 	app.Bootstrap()
-
 	app.Logger.Infof("app name[%s] runmode[%s] addr[%s] run", app.Name, app.RunMode, app.Addr)
 	srv := &http.Server{
 		Addr:    app.Addr,

@@ -29,7 +29,7 @@ type Options struct {
 var _ queue.Queuer = (*Queue)(nil)
 
 // New return queue base kafka
-func New(opts Options) queue.Queuer {
+func New(opts Options) *Queue {
 	opts.Init()
 	queue, err := newQueue(opts)
 	if err != nil {
@@ -38,7 +38,7 @@ func New(opts Options) queue.Queuer {
 	return queue
 }
 
-func newQueue(opts Options) (queue.Queuer, error) {
+func newQueue(opts Options) (*Queue, error) {
 	q := &Queue{
 		Options:  opts,
 		messages: make(chan string),
@@ -109,8 +109,9 @@ func (q *Queue) joinConsumerCluster(client sarama.ConsumerGroup) {
 			if err := client.Consume(q.ctx, []string{q.Name}, q); err != nil {
 				q.Logger.Errorf("join the consumer cluster of topic[%s] fail %s", q.Name, err.Error())
 				q.Backoff()
+			} else {
+				q.BackoffReset()
 			}
-			q.BackoffReset()
 		}
 	}()
 }

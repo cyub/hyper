@@ -25,7 +25,7 @@ var (
 type Queuer interface {
 	In(job Jober) (err error)
 	Parse(payload string) (j Jober, err error)
-	Do(job Jober, fn Consumer) (err error)
+	Do(job Jober, fn Consumer, cbs ...func(error)) (err error)
 	RegisterConsumer(name string, f Consumer)
 	Run()
 }
@@ -128,7 +128,7 @@ func (b *Base) Run() {
 }
 
 // Do use for run queue consume action
-func (b *Base) Do(job Jober, fn Consumer) (err error) {
+func (b *Base) Do(job Jober, fn Consumer, cbs ...func(error)) (err error) {
 	startTime := time.Now()
 	defer func() {
 		b.SemRelease(1)
@@ -140,7 +140,12 @@ func (b *Base) Do(job Jober, fn Consumer) (err error) {
 		}
 		ProcessTimeHist(job.GetName(), startTime)
 		if recoverErr != nil {
+			err = fmt.Errorf("panic error: %v", recoverErr)
 			fmt.Printf("[Queue Panic] %s\n[stacktrace]\n%s", err, stack(3))
+		}
+
+		for _, cb := range cbs {
+			cb(err)
 		}
 	}()
 	bf := backoff.Default()

@@ -22,7 +22,7 @@ type Options struct {
 var _ queue.Queuer = (*Queue)(nil)
 
 // New return queue base redis
-func New(opts Options) queue.Queuer {
+func New(opts Options) *Queue {
 	opts.Init()
 	if opts.Backend == nil {
 		panic("please provider redis as store backend")

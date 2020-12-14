@@ -5,17 +5,16 @@ package semaphore
 * @see http://www.golangpatterns.info/concurrency/Semaphores
  */
 
-// Empty is empty interface type
-type Empty interface{}
+// empty struct
+var empty = struct{}{}
 
 // Semaphore is empty type chan
-type Semaphore chan Empty
+type Semaphore chan struct{}
 
 // P used to acquire n resources
 func (s Semaphore) P(n int) {
-	e := new(Empty)
 	for i := 0; i < n; i++ {
-		s <- e
+		s <- empty
 	}
 }
 

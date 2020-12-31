@@ -63,6 +63,7 @@ func (app *App) BootstrapWith(mounters ...ComponentMount) *App {
 // Bootstrap use for boot core components
 func (app *App) Bootstrap() *App {
 	app.Once.Do(func() {
+		app.printBanner()
 		app.bootConfig()
 		app.bootBuildIns()
 		app.bootLogger()
@@ -167,6 +168,19 @@ func (app *App) Run() (err error) {
 
 	app.WaitGracefulExit(srv)
 	return
+}
+
+func (app *App) printBanner() {
+	const banner = `
+    __  __
+   / / / / __  __  ____   ___    _____
+  / /_/ / / / / / / __ \ / _ \  / ___/
+ / __  / / /_/ / / /_/ //  __/ / /
+/_/ /_/  \__, / / .___/ \___/ /_/
+        /____/ /_/
+Welcome to use Hyper, application is starting ...
+`
+	fmt.Printf("\x1b[32m%s\x1b[0m\n", banner)
 }
 
 // WaitGracefulExit graceful exit

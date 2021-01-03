@@ -11,6 +11,7 @@ import (
 	_config "github.com/cyub/hyper/config"
 	"github.com/cyub/hyper/logger"
 	config "github.com/cyub/hyper/pkg/config"
+	"github.com/cyub/hyper/router"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
@@ -117,6 +118,9 @@ func (app *App) bootBuildIns() {
 		app.SetGin(gin.New())
 	}
 
+	if app.Config.GetBool("app.profile", true) {
+		app.RegisterRouter(router.ProfileProvider())
+	}
 	if app.Config.GetBool("app.gin_logger", false) {
 		app.Use(gin.Logger())
 	}

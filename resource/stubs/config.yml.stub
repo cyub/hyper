@@ -1,0 +1,23 @@
+app:
+    profile: true
+    gin_logger: true
+mysql:
+  host: localhost
+  port: 3306
+  user: homestead
+  passwd: secret
+  db: homestead
+  log: true
+log:
+  writer: stdout
+  level: DEBUG
+  file: 
+  format: text
+redis:
+  addr: localhost:6379
+  db: 0
+  password:
+  read_timeout: 3
+  write_timeout: 3
+  pool_size: 10
+  pool_timeout: 3

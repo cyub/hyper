@@ -1,0 +1,10 @@
+package welcome
+
+import "github.com/gin-gonic/gin"
+
+// Greeting handle
+func Greeting(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"message": "welcome to {{.Package}}",
+	})
+}

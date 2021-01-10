@@ -1,0 +1,14 @@
+package router
+
+import (
+	"{{.Package}}/api/welcome"
+
+	"github.com/gin-gonic/gin"
+)
+
+// Provider for regsiter router
+func Provider() func(r *gin.Engine) {
+	return func(r *gin.Engine) {
+		r.GET("/welcome", welcome.Greeting)
+	}
+}

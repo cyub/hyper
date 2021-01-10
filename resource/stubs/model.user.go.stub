@@ -1,0 +1,23 @@
+package model
+
+import (
+	"time"
+
+	"github.com/cyub/hyper"
+)
+
+// User model struct
+type User struct {
+	ID        uint      `gorm:"primary_key" json:"id"`
+	Name      string    `gorm:"size:50" json:"name"`
+	Email     string    `gorm:"size:100" json:"email"`
+	Password  string    `gorm:"size:128" json"-"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// GetList return user list
+func (u *User) GetList() (users []User, err error) {
+	err = hyper.DB().Limit(10).Find(&users).Error
+	return
+}

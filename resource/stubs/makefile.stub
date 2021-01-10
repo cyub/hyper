@@ -1,0 +1,31 @@
+GOCMD=go
+GOBUILD=$(GOCMD) build
+GOFMT=$(GOCMD) fmt
+
+BINARY_NAME={{.Package}}
+
+COMMIT_HASH=$(shell git rev-parse HEAD || echo "unknown")
+BUILD_TIME=$(shell date '+%FT%T%z')
+LDFLAGS=-ldflags "-X main.Version=$(COMMIT_HASH) -X main.BuildTime=$(BUILD_TIME)"
+
+all: fmt build
+
+build:
+	$(GOBUILD) $(LDFLAGS) -o $(BINARY_NAME) -v
+
+build-linux:export GOOS=linux
+build-linux:export GOARCH=amd64
+build-linux:
+	$(GOBUILD) $(LDFLAGS) -o $(BINARY_NAME) -v
+
+run: build
+	./$(BINARY_NAME) -cfg.addr=file://./ -app.mode=dev
+
+dev:
+	air -c .air.conf
+
+clean:
+	rm -f $(BINARY_NAME)
+
+fmt:
+	$(GOFMT) ./...

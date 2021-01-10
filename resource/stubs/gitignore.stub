@@ -1,0 +1,9 @@
+/.idea/
+/vendor/
+.env
+.DS_Store
+/.vscode/
+.air.conf
+config.yml
+.k6.js
+tmp/

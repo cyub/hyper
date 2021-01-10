@@ -5,8 +5,30 @@ Hyper is an boilerplate for Golang Gin framework
 ## Install
 
 ```shell
-go get -u github.com/cyub/hyper
+go get -u github.com/cyub/hyper/cmd/hyper
 ```
+
+## Create Application
+
+```shell
+cd www/
+hyper new your_project_name
+```
+
+## Run Application
+
+```
+cd your_project_name
+make run
+```
+
+## Access Application
+
+```
+curl localhost:8000/welcome
+```
+
+
 ## Usage
 
 ```go

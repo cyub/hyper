@@ -7,6 +7,7 @@ type Options struct {
 	RunMode       string
 	CfgCenterAddr string
 	CfgCenterPath string
+	ShowBanner    bool
 }
 
 // Option use for inject option

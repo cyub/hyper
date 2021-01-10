@@ -41,6 +41,7 @@ func NewApp(opts ...Option) *App {
 			RunMode:       "dev",
 			CfgCenterAddr: "localhost:8500",
 			CfgCenterPath: "",
+			ShowBanner:    true,
 		},
 	}
 	for _, opt := range opts {
@@ -117,7 +118,6 @@ func (app *App) bootBuildIns() {
 	if app.Gin == nil {
 		app.SetGin(gin.New())
 	}
-
 	if app.Config.GetBool("app.profile", true) {
 		app.RegisterRouter(router.ProfileProvider())
 	}
@@ -175,12 +175,15 @@ func (app *App) Run() (err error) {
 }
 
 func (app *App) printBanner() {
+	if !app.ShowBanner {
+		return
+	}
 	const banner = `
     __  __
-   / / / / __  __  ____   ___    _____
-  / /_/ / / / / / / __ \ / _ \  / ___/
- / __  / / /_/ / / /_/ //  __/ / /
-/_/ /_/  \__, / / .___/ \___/ /_/
+   / / / / __  __  ____    ___    _____
+  / /_/ / / / / / / __ \  / _ \  / ___/
+ / __  / / /_/ / / /_/ / /  __/ / /
+/_/ /_/  \__, / / .___/  \___/ /_/
         /____/ /_/
 Welcome to use Hyper, application is starting ...
 `

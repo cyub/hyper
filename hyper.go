@@ -121,3 +121,10 @@ func WithCfgPath(cfgPath string) app.Option {
 		o.CfgCenterPath = cfgPath
 	}
 }
+
+// WithHideBanner use for set hide hyper banner
+func WithHideBanner() app.Option {
+	return func(o *app.Options) {
+		o.ShowBanner = false
+	}
+}

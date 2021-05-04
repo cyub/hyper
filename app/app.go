@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"sync"
 	"syscall"
 
@@ -203,7 +204,14 @@ func (app *App) WaitGracefulExit(srv *http.Server) {
 			logger.Debug("server exited")
 			return
 		case syscall.SIGHUP:
+			dumpStacks()
 		default:
 		}
 	}
+}
+
+func dumpStacks() {
+	buf := make([]byte, 16384)
+	buf = buf[:runtime.Stack(buf, true)]
+	logger.Infof("=== BEGIN gorutine stack dump ===\n%s\n=== END goroutine stack dump ===", buf)
 }

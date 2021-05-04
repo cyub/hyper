@@ -1,69 +1,58 @@
 # Hyper
 
-Hyper is an boilerplate for Golang Gin framework
+Hyper is a lightweight and easy-to-use framework. The hyper framework works out of the box. It has built-in commonly used components, you only need to turn it on according to your needs.
 
-## Install
+## Feature
+
+- Based on [gin](https://github.com/gin-gonic/gin) framework, Lightweight and easy to use
+- Config
+    - Based on [spf13/viper](https://github.com/spf13/viper) package
+    - Support local files (yaml format) and consul
+- Logger
+    - Base on [sirupsen/logrus](https://github.com/sirupsen/logrus) package
+    - Support multiple output sources (stdout/stderr/file)
+    - Support text or json format log output
+- Queue
+    - Support redis and kafka two types of queue storage backend
+    - Ability to recover from abnormal consumption tasks
+    - Support consumer task failure retry function
+    - Built-in prometheus exporter, you can review your queue
+- Mysql
+    - Base on [go-gorm/gorm](https://github.com/go-gorm/gorm) package
+	- The maximum number of connections, enable sql log and other settings only need to be configured
+- Discover
+    - Support Consul-based service registration and discovery
+- Selector
+    - Support getting nodes from Discover for load balancing
+    - Support RoundRobin strategy
+- Cache
+    - Support redis as a storage backend
+- Built-in performance analysis tool pprof
+
+## Install and Use
+
+### Install
 
 ```shell
 go get -u github.com/cyub/hyper/cmd/hyper
 ```
 
-## Create Application
+### Create Application
 
 ```shell
 cd www/
 hyper new your_project_name
 ```
 
-## Run Application
+### Run Application
 
 ```
 cd your_project_name
 make run
 ```
 
-## Access Application
+### Access Application
 
 ```
 curl localhost:8000/welcome
 ```
-
-
-## Usage
-
-```go
-package main
-
-import (
-    "net/http"
-	"github.com/cyub/hyper"
-	"github.com/cyub/hyper/mysql"
-	"github.com/cyub/hyper/queue"
-	"github.com/cyub/hyper/redis"
-	"github.com/gin-gonic/gin"
-)
-
-func main() {
-	app := hyper.NewApp(
-		hyper.WithName("hyper-demo"),
-		hyper.WithAddr(":8000"),
-		hyper.WithRunMode("dev"),
-	)
-	// bootstrap with some component as you need
-	app.BootstrapWith(
-		redis.Provider(),
-		mysql.Provider(),
-		queue.Provider(),
-	)
-	// register router
-	app.RegisterRouter(func(r *gin.Engine) {
-		r.GET("/", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
-				"message": "hello, world"
-			})
-		})
-	})
-	app.Run()
-}
-```
-

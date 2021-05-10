@@ -14,13 +14,23 @@ var db *gorm.DB
 // Provider use for mount to app bootstrap
 func Provider() app.ComponentMount {
 	return func(app *app.App) (err error) {
-		dsn := fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
+
+		dsn := fmt.Sprintf("%s:%s@(%s:%d)/%s?&loc=%s&parseTime=%s&collation=%s",
 			app.Config.GetString("mysql.user", "homestead"),
 			app.Config.GetString("mysql.passwd", "secret"),
 			app.Config.GetString("mysql.host", "localhost"),
 			app.Config.GetInt("mysql.port", 3306),
-			app.Config.GetString("mysql.db", "homestead"),
+			app.Config.GetString("mysql.db", "hyper"),
+			app.Config.GetString("mysql.loc", "UTC"),
+			app.Config.GetString("mysql.parse_time", "true"),
+			app.Config.GetString("mysql.collation", "utf8mb4_general_ci"),
 		)
+		// all parameters see https://github.com/go-sql-driver/mysql#parameters
+		// https://github.com/go-sql-driver/mysql#charset
+		charset := app.Config.GetString("mysql.charset", "")
+		if len(charset) > 0 {
+			dsn += "&charset=" + charset
+		}
 
 		db, err = gorm.Open("mysql", dsn)
 		if err != nil {

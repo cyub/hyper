@@ -16,6 +16,7 @@ import (
 	_redis "github.com/cyub/hyper/redis"
 	"github.com/go-redis/redis/v7"
 	"github.com/jinzhu/gorm"
+	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
 )
 
@@ -87,6 +88,11 @@ func InQueueWithRetry(name string, data interface{}, tries int) error {
 	return _queue.Instance().In(job)
 }
 
+// AddCronJob use add cron job
+func AddCronJob(spec string, cmd func()) {
+	app.AddCronJob(spec, cmd)
+}
+
 // WithName use for set app's name
 func WithName(name string) app.Option {
 	return func(o *app.Options) {
@@ -126,5 +132,19 @@ func WithCfgPath(cfgPath string) app.Option {
 func WithHideBanner() app.Option {
 	return func(o *app.Options) {
 		o.ShowBanner = false
+	}
+}
+
+// WithCronEnable use for enable cron. default is disable
+func WithCronEnable() app.Option {
+	return func(o *app.Options) {
+		o.CronEnable = true
+	}
+}
+
+// WithCron use for set user defined cron object
+func WithCron(cron *cron.Cron) app.Option {
+	return func(o *app.Options) {
+		o.Cron = cron
 	}
 }

@@ -14,6 +14,7 @@ import (
 	config "github.com/cyub/hyper/pkg/config"
 	"github.com/cyub/hyper/router"
 	"github.com/gin-gonic/gin"
+	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
 )
 
@@ -73,6 +74,7 @@ func (app *App) Bootstrap() *App {
 		app.bootMiddlewares()
 		app.bootRoutes()
 		app.bootComponents()
+		app.bootCron()
 	})
 
 	return app
@@ -155,6 +157,16 @@ func (app *App) bootComponents() {
 
 func (app *App) bootMiddlewares() {
 	app.Gin.Use(app.Middlewares...)
+}
+
+func (app *App) bootCron() {
+	if !app.Config.GetBool("cron.enable", app.CronEnable) {
+		return
+	}
+	if app.Cron == nil {
+		app.Cron = cron.New()
+	}
+	applyCron(app.Cron)
 }
 
 // Run use for run application

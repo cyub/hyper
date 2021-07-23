@@ -12,8 +12,10 @@ import (
 	"github.com/cyub/hyper/pkg/cache"
 	"github.com/cyub/hyper/pkg/config"
 	"github.com/cyub/hyper/pkg/queue"
+	"github.com/cyub/hyper/pkg/registry"
 	_queue "github.com/cyub/hyper/queue"
 	_redis "github.com/cyub/hyper/redis"
+	_registry "github.com/cyub/hyper/registry"
 	"github.com/go-redis/redis/v7"
 	"github.com/jinzhu/gorm"
 	"github.com/robfig/cron/v3"
@@ -58,6 +60,11 @@ func Queue() queue.Queuer {
 // Cache return cache.Cache
 func Cache() cache.Cache {
 	return _cache.Instance()
+}
+
+// Registry return registry.Registry
+func Registry() registry.Registry {
+	return _registry.Instance()
 }
 
 // NewJob return job

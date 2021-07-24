@@ -8,6 +8,7 @@ require (
 	github.com/go-redis/redis/v7 v7.2.0
 	github.com/gobuffalo/packr/v2 v2.8.1
 	github.com/gookit/color v1.3.6
+	github.com/hashicorp/consul/api v1.9.1
 	github.com/jinzhu/gorm v1.9.12
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/onsi/gomega v1.9.0 // indirect

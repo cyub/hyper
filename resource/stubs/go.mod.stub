@@ -3,5 +3,5 @@ module {{.Package}}
 go 1.13
 
 require (
-	github.com/cyub/hyper latest
+	github.com/cyub/hyper v1.1.0
 )

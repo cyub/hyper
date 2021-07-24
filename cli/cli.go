@@ -22,7 +22,7 @@ func Run() error {
 	app = &App{cli.NewApp(), nil, ""}
 	app.Name = "Hyper"
 	app.Usage = "hyper is an boilerplate for Golang Gin framework"
-	app.Version = "1.0.0"
+	app.Version = "1.1.0"
 	app.HelpName = "hyper"
 	app.Commands = []*cli.Command{
 		newCmd,

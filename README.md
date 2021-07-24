@@ -34,7 +34,7 @@ Hyper is a lightweight and easy-to-use framework. The hyper framework works out 
 ### Install
 
 ```shell
-go get -u github.com/cyub/hyper/cmd/hyper
+go get -u github.com/cyub/hyper/cmd/hyper@v1.1.0
 ```
 
 ### Create Application
@@ -50,6 +50,8 @@ hyper new your_project_name
 cd your_project_name
 make run
 ```
+
+If an error message like `github.com/coreos/etcd@v3.3.10+incompatible/client/keys.generated.go:63:14: z.HasExtensions` appears during operation, remove this `keys.generated.go` file to solve the problem
 
 ### Access Application
 
